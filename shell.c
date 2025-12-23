@@ -4,7 +4,6 @@
 char *trim_spaces(char *str)
 {
     char *end;
-
     while (*str == ' ' || *str == '\t')
         str++;
 
@@ -26,24 +25,42 @@ int is_executable(char *path)
     return (stat(path, &st) == 0 && (st.st_mode & S_IXUSR));
 }
 
-/* Search command in PATH */
+/* Search command in PATH, or return NULL if not found */
 char *get_full_path(char *cmd)
 {
     char *path_env = getenv("PATH");
     char *path_dup, *dir;
     char *full_path = malloc(1024);
-    if (!path_env || !full_path)
+    if (!full_path)
         return NULL;
 
-    if (strchr(cmd, '/')) /* Already a path */
+    /* If command contains '/', treat as path */
+    if (strchr(cmd, '/'))
     {
         if (is_executable(cmd))
-            return strdup(cmd);
+        {
+            strncpy(full_path, cmd, 1023);
+            full_path[1023] = '\0';
+            return full_path;
+        }
+        free(full_path);
+        return NULL;
+    }
+
+    /* PATH empty or not set */
+    if (!path_env || strlen(path_env) == 0)
+    {
         free(full_path);
         return NULL;
     }
 
     path_dup = strdup(path_env);
+    if (!path_dup)
+    {
+        free(full_path);
+        return NULL;
+    }
+
     dir = strtok(path_dup, ":");
     while (dir)
     {
@@ -61,17 +78,17 @@ char *get_full_path(char *cmd)
     return NULL;
 }
 
-/* Fork and execute a command */
+/* Execute command if executable found */
 void execute_command(char **argv)
 {
     pid_t pid;
     int status;
-
     char *full_path = get_full_path(argv[0]);
+
     if (!full_path)
     {
         fprintf(stderr, "%s: command not found\n", argv[0]);
-        return; /* skip fork */
+        return;
     }
 
     pid = fork();
