@@ -1,116 +1,92 @@
 #include "shell.h"
 
-/* Remove leading and trailing spaces/tabs */
-char *trim_spaces(char *str)
+/**
+ * split_line - splits input line into arguments
+ */
+char **split_line(char *line)
 {
-    char *end;
-    while (*str == ' ' || *str == '\t')
-        str++;
+	char **tokens;
+	char *token;
+	int i = 0;
 
-    if (*str == '\0')
-        return str;
+	tokens = malloc(sizeof(char *) * 64);
+	if (!tokens)
+		return (NULL);
 
-    end = str + strlen(str) - 1;
-    while (end > str && (*end == ' ' || *end == '\t'))
-        end--;
-
-    *(end + 1) = '\0';
-    return str;
+	token = strtok(line, " \t\n");
+	while (token)
+	{
+		tokens[i++] = token;
+		token = strtok(NULL, " \t\n");
+	}
+	tokens[i] = NULL;
+	return (tokens);
 }
 
-/* Check if file exists and is executable */
-int is_executable(char *path)
+/**
+ * find_command - find command in PATH
+ */
+char *find_command(char *cmd)
 {
-    struct stat st;
-    return (stat(path, &st) == 0 && (st.st_mode & S_IXUSR));
+	char *path, *path_copy, *token, *full;
+
+	if (strchr(cmd, '/'))
+	{
+		if (access(cmd, X_OK) == 0)
+			return (strdup(cmd));
+		return (NULL);
+	}
+
+	path = getenv("PATH");
+	if (!path || *path == '\0')
+		return (NULL);
+
+	path_copy = strdup(path);
+	token = strtok(path_copy, ":");
+
+	while (token)
+	{
+		full = malloc(strlen(token) + strlen(cmd) + 2);
+		sprintf(full, "%s/%s", token, cmd);
+
+		if (access(full, X_OK) == 0)
+		{
+			free(path_copy);
+			return (full);
+		}
+		free(full);
+		token = strtok(NULL, ":");
+	}
+
+	free(path_copy);
+	return (NULL);
 }
 
-/* Search command in PATH, or return NULL if not found */
-char *get_full_path(char *cmd)
+/**
+ * execute - execute a command
+ */
+void execute(char **args)
 {
-    char *path_env = getenv("PATH");
-    char *path_dup, *dir;
-    char *full_path = malloc(1024);
-    if (!full_path)
-        return NULL;
+	pid_t pid;
+	char *cmd;
 
-    /* If command contains '/', treat as path */
-    if (strchr(cmd, '/'))
-    {
-        if (is_executable(cmd))
-        {
-            strncpy(full_path, cmd, 1023);
-            full_path[1023] = '\0';
-            return full_path;
-        }
-        free(full_path);
-        return NULL;
-    }
+	cmd = find_command(args[0]);
+	if (!cmd)
+	{
+		write(STDERR_FILENO, args[0], strlen(args[0]));
+		write(STDERR_FILENO, ": not found\n", 12);
+		return; /* ❗ لا fork */
+	}
 
-    /* PATH empty or not set */
-    if (!path_env || strlen(path_env) == 0)
-    {
-        free(full_path);
-        return NULL;
-    }
+	pid = fork();
+	if (pid == 0)
+	{
+		execve(cmd, args, environ);
+		perror("execve");
+		exit(EXIT_FAILURE);
+	}
+	else
+		wait(NULL);
 
-    path_dup = strdup(path_env);
-    if (!path_dup)
-    {
-        free(full_path);
-        return NULL;
-    }
-
-    dir = strtok(path_dup, ":");
-    while (dir)
-    {
-        snprintf(full_path, 1024, "%s/%s", dir, cmd);
-        if (is_executable(full_path))
-        {
-            free(path_dup);
-            return full_path;
-        }
-        dir = strtok(NULL, ":");
-    }
-
-    free(path_dup);
-    free(full_path);
-    return NULL;
-}
-
-/* Execute command if executable found */
-void execute_command(char **argv)
-{
-    pid_t pid;
-    int status;
-    char *full_path = get_full_path(argv[0]);
-
-    if (!full_path)
-    {
-        fprintf(stderr, "%s: command not found\n", argv[0]);
-        return;
-    }
-
-    pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        free(full_path);
-        return;
-    }
-
-    if (pid == 0)
-    {
-        if (execve(full_path, argv, environ) == -1)
-        {
-            perror("execve");
-            exit(1);
-        }
-    }
-    else
-    {
-        wait(&status);
-    }
-
-    free(full_path);
+	free(cmd);
 }
