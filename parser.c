@@ -19,7 +19,6 @@ char **tokenize_input(char *input)
     if (input_copy == NULL)
         return (NULL);
     
-    /* Count tokens */
     token = strtok(input_copy, " \t");
     while (token != NULL)
     {
@@ -29,12 +28,13 @@ char **tokenize_input(char *input)
     
     free(input_copy);
     
-    /* Allocate memory for args */
+    if (count == 0)
+        return (NULL);
+    
     args = malloc(sizeof(char *) * (count + 1));
     if (args == NULL)
         return (NULL);
     
-    /* Tokenize again to store tokens */
     input_copy = _strdup(input);
     token = strtok(input_copy, " \t");
     

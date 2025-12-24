@@ -20,34 +20,26 @@ int main(void)
         read = getline(&input, &len, stdin);
         
         if (read == -1)
-        {
             handle_eof(input);
-        }
 
-        /* Remove newline character */
-        if (input[read - 1] == '\n')
+        if (read > 0 && input[read - 1] == '\n')
             input[read - 1] = '\0';
 
-        /* Skip empty lines and lines with only spaces */
-        if (input[0] == '\0' || input[0] == ' ' || input[0] == '\t')
+        remove_comments(input);
+        strip_leading_trailing_spaces(input);
+
+        if (input[0] == '\0')
             continue;
 
-        /* Handle exit built-in */
-        if (_strcmp(input, "exit") == 0)
-        {
-            free(input);
-            exit(0);
-        }
-
-        /* Tokenize input */
         args = tokenize_input(input);
         if (args == NULL || args[0] == NULL)
+        {
+            if (args)
+                cleanup_args(args);
             continue;
+        }
 
-        /* Execute command */
         execute_command(args);
-        
-        /* Clean up */
         cleanup_args(args);
     }
 

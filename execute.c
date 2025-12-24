@@ -1,11 +1,36 @@
 #include "shell.h"
 
 /**
+ * handle_command_error - Handles command not found errors
+ * @command: Command that wasn't found
+ */
+static void handle_command_error(char *command)
+{
+    struct stat st;
+    
+    if (is_absolute_path(command))
+    {
+        if (stat(command, &st) == -1)
+        {
+            write(STDERR_FILENO, command, _strlen(command));
+            write(STDERR_FILENO, ": No such file or directory\n", 28);
+        }
+        else if (access(command, X_OK) == -1)
+        {
+            write(STDERR_FILENO, command, _strlen(command));
+            write(STDERR_FILENO, ": Permission denied\n", 20);
+        }
+    }
+    else
+    {
+        write(STDERR_FILENO, command, _strlen(command));
+        write(STDERR_FILENO, ": command not found\n", 20);
+    }
+}
+
+/**
  * execute_command - Executes a command with arguments
  * @args: Array of arguments (args[0] is the command)
- *
- * Description: Finds the command in PATH, checks if it exists,
- * and only then forks to execute it.
  */
 void execute_command(char **args)
 {
@@ -16,16 +41,13 @@ void execute_command(char **args)
     if (args == NULL || args[0] == NULL)
         return;
     
-    /* Check if command exists before forking */
     command_path = find_in_path(args[0]);
     if (command_path == NULL)
     {
-        write(STDERR_FILENO, args[0], _strlen(args[0]));
-        write(STDERR_FILENO, ": command not found\n", 20);
+        handle_command_error(args[0]);
         return;
     }
     
-    /* Fork and execute */
     pid = fork();
     if (pid == -1)
     {
@@ -33,18 +55,15 @@ void execute_command(char **args)
         free(command_path);
         return;
     }
-    else if (pid == 0) /* Child process */
+    
+    if (pid == 0)
     {
-        if (execve(command_path, args, environ) == -1)
-        {
-            perror(args[0]);
-            free(command_path);
-            exit(EXIT_FAILURE);
-        }
-    }
-    else /* Parent process */
-    {
-        waitpid(pid, &status, 0);
+        execve(command_path, args, environ);
+        perror(args[0]);
         free(command_path);
+        exit(EXIT_FAILURE);
     }
+    
+    waitpid(pid, &status, 0);
+    free(command_path);
 }

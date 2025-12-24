@@ -8,12 +8,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <errno.h>
 
-/* Environment variable functions */
 extern char **environ;
-char *_getenv(const char *name);
 
-/* String utility functions */
+/* String utilities */
 int _strlen(const char *s);
 char *_strdup(const char *str);
 char *_strcpy(char *dest, const char *src);
@@ -22,20 +21,26 @@ int _strcmp(const char *s1, const char *s2);
 char *_strchr(const char *s, char c);
 int _strncmp(const char *s1, const char *s2, size_t n);
 
-/* Path handling functions (path.c) */
-char *find_in_path(char *command);
-char *build_full_path(char *dir, char *command);
-int file_exists(char *path);
+/* Shell utilities */
+void print_prompt(void);
+void handle_eof(char *input);
+void remove_comments(char *input);
+void strip_leading_trailing_spaces(char *str);
+int is_whitespace(char c);
 
-/* Parser functions (parser.c) */
+/* Environment */
+char *_getenv(const char *name);
+
+/* Path handling */
+char *find_in_path(char *command);
+int file_exists(char *path);
+int is_absolute_path(char *command);
+
+/* Parsing */
 char **tokenize_input(char *input);
 void cleanup_args(char **args);
 
-/* Execution functions (execute.c) */
+/* Execution */
 void execute_command(char **args);
-
-/* Shell main functions */
-void print_prompt(void);
-void handle_eof(char *input);
 
 #endif /* SHELL_H */
