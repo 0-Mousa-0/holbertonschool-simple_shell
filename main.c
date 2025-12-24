@@ -2,45 +2,30 @@
 
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread;
-    char *argv[64];
-    char *command;
-    int i;
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char **args;
 
-    while (1)
-    {
-        if (isatty(STDIN_FILENO))
-            write(STDOUT_FILENO, ":) ", 3);
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, ":) ", 3);
 
-        nread = getline(&line, &len, stdin);
-        if (nread == -1)
-        {
-            free(line);
-            exit(0);
-        }
+		read = getline(&line, &len, stdin);
+		if (read == -1)
+			break;
 
-        if (line[nread - 1] == '\n')
-            line[nread - 1] = '\0';
+		if (line[0] == '\n')
+			continue;
 
-        command = trim_spaces(line);
-        if (*command == '\0')
-            continue;
+		args = split_line(line);
+		if (args && args[0])
+			execute(args);
 
-        /* Split command into argv */
-        i = 0;
-        argv[i] = strtok(command, " \t");
-        while (argv[i] && i < 63)
-        {
-            i++;
-            argv[i] = strtok(NULL, " \t");
-        }
-        argv[i] = NULL;
+		free(args);
+	}
 
-        execute_command(argv);
-    }
-
-    free(line);
-    return 0;
+	free(line);
+	return (0);
 }

@@ -10,13 +10,10 @@
 
 extern char **environ;
 
-/* Utilities */
-char *trim_spaces(char *str);
-int is_executable(char *path);
-char *get_full_path(char *cmd);
 
-/* Shell execution */
-void execute_command(char **argv);
+char **split_line(char *line);
+char *find_command(char *cmd);
+void execute(char **args);
 
 #endif /* SHELL_H */
 
