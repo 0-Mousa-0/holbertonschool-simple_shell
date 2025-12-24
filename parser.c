@@ -1,34 +1,75 @@
 #include "shell.h"
 
-int is_empty_line(char *line)
+/**
+ * tokenize_input - Tokenizes input string into arguments
+ * @input: Input string
+ * Return: Array of arguments or NULL
+ */
+char **tokenize_input(char *input)
 {
-	int i = 0;
-
-	while (line[i])
-	{
-		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n')
-			return (0);
-		i++;
-	}
-	return (1);
+    char **args = NULL;
+    char *token;
+    int i = 0, count = 0;
+    char *input_copy;
+    
+    if (input == NULL || input[0] == '\0')
+        return (NULL);
+    
+    input_copy = _strdup(input);
+    if (input_copy == NULL)
+        return (NULL);
+    
+    /* Count tokens */
+    token = strtok(input_copy, " \t");
+    while (token != NULL)
+    {
+        count++;
+        token = strtok(NULL, " \t");
+    }
+    
+    free(input_copy);
+    
+    /* Allocate memory for args */
+    args = malloc(sizeof(char *) * (count + 1));
+    if (args == NULL)
+        return (NULL);
+    
+    /* Tokenize again to store tokens */
+    input_copy = _strdup(input);
+    token = strtok(input_copy, " \t");
+    
+    while (token != NULL)
+    {
+        args[i] = _strdup(token);
+        if (args[i] == NULL)
+        {
+            free(input_copy);
+            cleanup_args(args);
+            return (NULL);
+        }
+        i++;
+        token = strtok(NULL, " \t");
+    }
+    
+    args[i] = NULL;
+    free(input_copy);
+    
+    return (args);
 }
 
-char **parse_line(char *line)
+/**
+ * cleanup_args - Frees memory allocated for arguments
+ * @args: Array of arguments to free
+ */
+void cleanup_args(char **args)
 {
-	char **argv;
-	int i = 0;
-	char *tok;
-
-	argv = malloc(sizeof(char *) * 64);
-	if (!argv)
-		return (NULL);
-
-	tok = strtok(line, " \t\n");
-	while (tok)
-	{
-		argv[i++] = tok;
-		tok = strtok(NULL, " \t\n");
-	}
-	argv[i] = NULL;
-	return (argv);
+    int i;
+    
+    if (args == NULL)
+        return;
+    
+    for (i = 0; args[i] != NULL; i++)
+        free(args[i]);
+    
+    free(args);
 }
