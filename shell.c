@@ -30,6 +30,9 @@ char *find_command(char *cmd)
 {
 	char *path, *path_copy, *token, *full;
 
+	if (!cmd || *cmd == '\0')
+		return (NULL);
+
 	if (strchr(cmd, '/'))
 	{
 		if (access(cmd, X_OK) == 0)
@@ -38,7 +41,7 @@ char *find_command(char *cmd)
 	}
 
 	path = getenv("PATH");
-	if (!path || *path == '\0')
+	if (!path)
 		return (NULL);
 
 	path_copy = strdup(path);
@@ -46,8 +49,16 @@ char *find_command(char *cmd)
 
 	while (token)
 	{
-		full = malloc(strlen(token) + strlen(cmd) + 2);
-		sprintf(full, "%s/%s", token, cmd);
+		if (*token == '\0')
+		{
+			full = malloc(strlen(cmd) + 3);
+			sprintf(full, "./%s", cmd);
+		}
+		else
+		{
+			full = malloc(strlen(token) + strlen(cmd) + 2);
+			sprintf(full, "%s/%s", token, cmd);
+		}
 
 		if (access(full, X_OK) == 0)
 		{
@@ -75,7 +86,7 @@ void execute(char **args)
 	{
 		write(STDERR_FILENO, args[0], strlen(args[0]));
 		write(STDERR_FILENO, ": not found\n", 12);
-		return; /* ❗ لا fork */
+		return; /*fork */
 	}
 
 	pid = fork();
