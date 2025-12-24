@@ -4,26 +4,30 @@ int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t read;
-	char **args;
+	ssize_t r;
+	char **argv;
 
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, ":) ", 3);
+			write(1, ":) ", 3);
 
-		read = getline(&line, &len, stdin);
-		if (read == -1)
+		r = getline(&line, &len, stdin);
+		if (r == -1)
 			break;
 
-		if (line[0] == '\n')
+		if (is_empty_line(line))
 			continue;
 
-		args = split_line(line);
-		if (args && args[0])
-			execute(args);
+		argv = parse_line(line);
+		if (!argv || !argv[0])
+		{
+			free(argv);
+			continue;
+		}
 
-		free(args);
+		execute_command(argv);
+		free(argv);
 	}
 
 	free(line);

@@ -6,14 +6,17 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
 
 extern char **environ;
 
+/* parser */
+char **parse_line(char *line);
+int is_empty_line(char *line);
 
-char **split_line(char *line);
-char *find_command(char *cmd);
-void execute(char **args);
+/* path */
+char *resolve_command(char *cmd);
 
-#endif /* SHELL_H */
+/* execute */
+void execute_command(char **argv);
 
+#endif
