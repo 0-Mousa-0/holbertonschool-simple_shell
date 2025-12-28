@@ -85,12 +85,6 @@ int change_dir(char **args)
         return (1);
     }
     
-    /* Get and optionally print new directory */
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-    {
-        /* In simple shell, we don't update PWD env variable */
-        return (1);
-    }
-    
+    getcwd(cwd, sizeof(cwd)); /* Just to avoid warning */
     return (1);
 }
