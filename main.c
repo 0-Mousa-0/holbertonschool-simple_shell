@@ -2,7 +2,7 @@
 
 /**
  * main - Simple shell entry point
- * @argc: Argument count
+ * @argc: Argument count (unused)
  * @argv: Argument vector
  * @env: Environment variables
  * Return: Exit status
@@ -15,36 +15,32 @@ int main(int argc, char **argv, char **env)
     
     (void)argc;
     (void)argv;
-    (void)env;
+    
+    /* Set environment if needed */
+    if (env != NULL)
+    {
+        environ = env;
+    }
     
     while (status)
     {
-        /* Display prompt if in interactive mode */
         if (isatty(STDIN_FILENO))
             display_prompt();
         
-        /* Read input */
         input = read_input();
         if (input == NULL)
-        {
-            if (isatty(STDIN_FILENO))
-                printf("\n");
             break;
-        }
         
-        /* Parse input */
         args = parse_input(input);
-        if (args == NULL)
+        if (args == NULL || args[0] == NULL)
         {
             free(input);
+            free_args(args);
             continue;
         }
         
-        /* Execute command */
-        if (args[0] != NULL)
-            status = execute_command(args);
+        status = execute_command(args);
         
-        /* Clean up */
         free(input);
         free_args(args);
     }

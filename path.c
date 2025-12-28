@@ -1,50 +1,97 @@
 #include "shell.h"
 
 /**
- * find_in_path - Find command in PATH directories
- * @command: Command to find
- * Return: Full path if found, NULL otherwise
+ * is_path_command - Check if command contains path separator
+ * @command: Command to check
+ * Return: 1 if contains '/', 0 otherwise
  */
-char *find_in_path(char *command)
+int is_path_command(const char *command)
 {
-    char *path, *path_copy, *dir, *full_path;
-    struct stat st;
+    int i = 0;
     
-    /* Check if command contains '/' (absolute or relative path) */
-    if (strchr(command, '/') != NULL)
+    if (!command)
+        return (0);
+    
+    while (command[i])
     {
-        if (stat(command, &st) == 0)
+        if (command[i] == '/')
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
+/**
+ * build_full_path - Build full path from directory and command
+ * @dir: Directory path
+ * @command: Command name
+ * Return: Full path string or NULL
+ */
+char *build_full_path(const char *dir, const char *command)
+{
+    char *full_path;
+    int dir_len, cmd_len;
+    
+    if (!dir || !command)
+        return (NULL);
+    
+    dir_len = _strlen(dir);
+    cmd_len = _strlen(command);
+    
+    full_path = malloc(dir_len + cmd_len + 2);
+    if (!full_path)
+        return (NULL);
+    
+    _strcpy(full_path, dir);
+    if (dir[dir_len - 1] != '/')
+        _strcat(full_path, "/");
+    _strcat(full_path, command);
+    
+    return (full_path);
+}
+
+/**
+ * find_executable - Find executable in PATH or as absolute/relative path
+ * @command: Command to find
+ * Return: Full path if found and executable, NULL otherwise
+ */
+char *find_executable(char *command)
+{
+    struct stat st;
+    char *path, *path_copy, *dir, *full_path;
+    
+    if (!command)
+        return (NULL);
+    
+    /* Check if command is already a path */
+    if (is_path_command(command))
+    {
+        if (stat(command, &st) == 0 && (st.st_mode & S_IXUSR))
             return (_strdup(command));
         return (NULL);
     }
     
     /* Get PATH from environment */
-    path = getenv("PATH");
-    if (path == NULL)
+    path = _getenv("PATH");
+    if (path == NULL || path[0] == '\0')
+    {
         return (NULL);
+    }
     
     path_copy = _strdup(path);
-    if (path_copy == NULL)
+    if (!path_copy)
         return (NULL);
     
-    /* Tokenize PATH and search each directory */
     dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
-        /* Allocate memory for full path */
-        full_path = malloc(_strlen(dir) + _strlen(command) + 2);
-        if (full_path == NULL)
+        full_path = build_full_path(dir, command);
+        if (!full_path)
         {
             free(path_copy);
             return (NULL);
         }
         
-        /* Build full path: dir + "/" + command */
-        _strcpy(full_path, dir);
-        _strcat(full_path, "/");
-        _strcat(full_path, command);
-        
-        /* Check if file exists and is executable */
         if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
         {
             free(path_copy);
@@ -60,19 +107,11 @@ char *find_in_path(char *command)
 }
 
 /**
- * check_command_exists - Check if command exists
- * @command: Command to check
- * Return: 1 if exists, 0 otherwise
+ * find_in_path - Legacy function for compatibility
+ * @command: Command to find
+ * Return: Full path if found
  */
-int check_command_exists(char *command)
+char *find_in_path(char *command)
 {
-    char *path = find_in_path(command);
-    
-    if (path != NULL)
-    {
-        free(path);
-        return (1);
-    }
-    
-    return (0);
+    return (find_executable(command));
 }
