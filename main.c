@@ -16,7 +16,7 @@ int main(int argc, char **argv, char **env)
     (void)argc;
     (void)argv;
     
-    /* Set environment if needed */
+    /* Set environment */
     if (env != NULL)
     {
         environ = env;
