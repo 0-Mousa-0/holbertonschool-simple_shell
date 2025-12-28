@@ -51,9 +51,10 @@ return (1);
 /**
  * execute_command - Execute a command
  * @args: Array of arguments
- * Return: 1 to continue, 0 to exit
+ * @prog_name: Program name (argv[0])
+ * Return: 1 to continue, 127 for command not found
  */
-int execute_command(char **args)
+int execute_command(char **args, char *prog_name)
 {
 pid_t pid;
 int status;
@@ -68,8 +69,8 @@ return (handle_builtin(args));
 full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
-print_error("hsh", args[0]);
-return (1);
+print_error(prog_name, args[0]);
+return (127);  /* Return 127 for command not found */
 }
 
 pid = fork();
@@ -77,13 +78,14 @@ if (pid == 0)
 {
 if (execve(full_path, args, environ) == -1)
 {
+print_error(prog_name, args[0]);
 free(full_path);
-_exit(EXIT_FAILURE);
+_exit(127);
 }
 }
 else if (pid < 0)
 {
-perror("hsh");
+perror(prog_name);
 free(full_path);
 }
 else
