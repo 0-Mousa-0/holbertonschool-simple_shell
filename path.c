@@ -21,7 +21,13 @@ return (NULL);
 }
 
 path = _getenv("PATH");
-if (path == NULL || path[0] == '\0')
+
+/* If PATH is NULL (not set), command not found */
+if (path == NULL)
+return (NULL);
+
+/* If PATH is empty string, command not found */
+if (path[0] == '\0')
 return (NULL);
 
 path_copy = _strdup(path);
