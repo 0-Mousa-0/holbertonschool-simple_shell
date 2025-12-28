@@ -1,75 +1,66 @@
 #include "shell.h"
 
 /**
- * tokenize_input - Tokenizes input string into arguments
+ * parse_input - Parse input line into arguments
  * @input: Input string
- * Return: Array of arguments or NULL
+ * Return: Array of arguments
  */
-char **tokenize_input(char *input)
+char **parse_input(char *input)
 {
-    char **args = NULL;
+    int bufsize = 64;
+    int position = 0;
+    char **args = malloc(bufsize * sizeof(char *));
     char *token;
-    int i = 0, count = 0;
-    char *input_copy;
     
-    if (input == NULL || input[0] == '\0')
-        return (NULL);
-    
-    input_copy = _strdup(input);
-    if (input_copy == NULL)
-        return (NULL);
-    
-    token = strtok(input_copy, " \t");
-    while (token != NULL)
+    if (!args)
     {
-        count++;
-        token = strtok(NULL, " \t");
+        fprintf(stderr, "Allocation error\n");
+        return (NULL);
     }
     
-    free(input_copy);
-    
-    if (count == 0)
-        return (NULL);
-    
-    args = malloc(sizeof(char *) * (count + 1));
-    if (args == NULL)
-        return (NULL);
-    
-    input_copy = _strdup(input);
-    token = strtok(input_copy, " \t");
-    
+    token = strtok(input, " \t\r\n\a");
     while (token != NULL)
     {
-        args[i] = _strdup(token);
-        if (args[i] == NULL)
+        args[position] = _strdup(token);
+        if (!args[position])
         {
-            free(input_copy);
-            cleanup_args(args);
+            free_args(args);
             return (NULL);
         }
-        i++;
-        token = strtok(NULL, " \t");
+        position++;
+        
+        if (position >= bufsize)
+        {
+            bufsize += 64;
+            args = realloc(args, bufsize * sizeof(char *));
+            if (!args)
+            {
+                fprintf(stderr, "Allocation error\n");
+                return (NULL);
+            }
+        }
+        
+        token = strtok(NULL, " \t\r\n\a");
     }
-    
-    args[i] = NULL;
-    free(input_copy);
+    args[position] = NULL;
     
     return (args);
 }
 
 /**
- * cleanup_args - Frees memory allocated for arguments
- * @args: Array of arguments to free
+ * is_builtin - Check if command is a built-in
+ * @command: Command to check
+ * Return: 1 if built-in, 0 otherwise
  */
-void cleanup_args(char **args)
+int is_builtin(char *command)
 {
+    char *builtins[] = {"exit", "env", "cd", "help", NULL};
     int i;
     
-    if (args == NULL)
-        return;
-    
-    for (i = 0; args[i] != NULL; i++)
-        free(args[i]);
-    
-    free(args);
+    for (i = 0; builtins[i]; i++)
+    {
+        if (_strcmp(command, builtins[i]) == 0)
+            return (1);
+    }
+    return (0);
 }

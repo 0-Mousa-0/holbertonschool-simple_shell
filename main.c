@@ -1,48 +1,53 @@
 #include "shell.h"
 
 /**
- * main - Entry point for the simple shell
- * Return: Always 0
+ * main - Simple shell entry point
+ * @argc: Argument count
+ * @argv: Argument vector
+ * @env: Environment variables
+ * Return: Exit status
  */
-int main(void)
+int main(int argc, char **argv, char **env)
 {
     char *input = NULL;
-    size_t len = 0;
-    ssize_t read;
-    char **args;
-    int interactive = isatty(STDIN_FILENO);
-
-    while (1)
+    char **args = NULL;
+    int status = 1;
+    
+    (void)argc;
+    (void)argv;
+    (void)env;
+    
+    while (status)
     {
-        if (interactive)
-            print_prompt();
-
-        read = getline(&input, &len, stdin);
+        /* Display prompt if in interactive mode */
+        if (isatty(STDIN_FILENO))
+            display_prompt();
         
-        if (read == -1)
-            handle_eof(input);
-
-        if (read > 0 && input[read - 1] == '\n')
-            input[read - 1] = '\0';
-
-        remove_comments(input);
-        strip_leading_trailing_spaces(input);
-
-        if (input[0] == '\0')
-            continue;
-
-        args = tokenize_input(input);
-        if (args == NULL || args[0] == NULL)
+        /* Read input */
+        input = read_input();
+        if (input == NULL)
         {
-            if (args)
-                cleanup_args(args);
+            if (isatty(STDIN_FILENO))
+                printf("\n");
+            break;
+        }
+        
+        /* Parse input */
+        args = parse_input(input);
+        if (args == NULL)
+        {
+            free(input);
             continue;
         }
-
-        execute_command(args);
-        cleanup_args(args);
+        
+        /* Execute command */
+        if (args[0] != NULL)
+            status = execute_command(args);
+        
+        /* Clean up */
+        free(input);
+        free_args(args);
     }
-
-    free(input);
+    
     return (0);
 }

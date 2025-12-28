@@ -9,38 +9,39 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <limits.h>
 
+/* Global environment */
 extern char **environ;
 
-/* String utilities */
-int _strlen(const char *s);
-char *_strdup(const char *str);
-char *_strcpy(char *dest, const char *src);
-char *_strcat(char *dest, const char *src);
-int _strcmp(const char *s1, const char *s2);
-char *_strchr(const char *s, char c);
-int _strncmp(const char *s1, const char *s2, size_t n);
+/* Function prototypes */
 
-/* Shell utilities */
-void print_prompt(void);
-void handle_eof(char *input);
-void remove_comments(char *input);
-void strip_leading_trailing_spaces(char *str);
-int is_whitespace(char c);
+/* Main shell functions */
+void display_prompt(void);
+char *read_input(void);
+char **parse_input(char *input);
+int execute_command(char **args);
 
-/* Environment */
-char *_getenv(const char *name);
+/* Built-in functions */
+int handle_builtin(char **args);
+int exit_shell(char **args);
+int print_env(char **args);
+int change_dir(char **args);
 
-/* Path handling */
+/* Path handling functions */
 char *find_in_path(char *command);
-int file_exists(char *path);
-int is_absolute_path(char *command);
+int check_command_exists(char *command);
 
-/* Parsing */
-char **tokenize_input(char *input);
-void cleanup_args(char **args);
+/* Utility functions */
+void free_args(char **args);
+void print_error(char *program, char *command);
+int is_builtin(char *command);
 
-/* Execution */
-void execute_command(char **args);
+/* Custom string functions */
+int _strlen(char *s);
+char *_strdup(char *str);
+int _strcmp(char *s1, char *s2);
+char *_strcpy(char *dest, char *src);
+char *_strcat(char *dest, char *src);
 
-#endif /* SHELL_H */
+#endif

@@ -1,82 +1,98 @@
 #include "shell.h"
 
 /**
- * _strchr - Locates character in string
- * @s: String to search
- * @c: Character to find
- * Return: Pointer to first occurrence or NULL
+ * _strlen - Get string length
+ * @s: String
+ * Return: Length of string
  */
-char *_strchr(const char *s, char c)
+int _strlen(char *s)
 {
-    while (*s != '\0')
-    {
-        if (*s == c)
-            return (char *)s;
-        s++;
-    }
+    int len = 0;
     
-    return (NULL);
+    while (s[len])
+        len++;
+    
+    return (len);
 }
 
 /**
- * _strncmp - Compares two strings up to n characters
+ * _strdup - Duplicate a string
+ * @str: String to duplicate
+ * Return: Duplicated string
+ */
+char *_strdup(char *str)
+{
+    char *dup;
+    int len, i;
+    
+    if (str == NULL)
+        return (NULL);
+    
+    len = _strlen(str);
+    dup = malloc(len + 1);
+    
+    if (dup == NULL)
+        return (NULL);
+    
+    for (i = 0; i <= len; i++)
+        dup[i] = str[i];
+    
+    return (dup);
+}
+
+/**
+ * _strcmp - Compare two strings
  * @s1: First string
  * @s2: Second string
- * @n: Number of characters to compare
- * Return: 0 if equal, negative if s1 < s2, positive if s1 > s2
+ * Return: 0 if equal, difference otherwise
  */
-int _strncmp(const char *s1, const char *s2, size_t n)
+int _strcmp(char *s1, char *s2)
 {
-    size_t i;
+    int i = 0;
     
-    for (i = 0; i < n; i++)
+    while (s1[i] && s2[i] && s1[i] == s2[i])
+        i++;
+    
+    return (s1[i] - s2[i]);
+}
+
+/**
+ * _strcpy - Copy string
+ * @dest: Destination
+ * @src: Source
+ * Return: Pointer to dest
+ */
+char *_strcpy(char *dest, char *src)
+{
+    int i = 0;
+    
+    while (src[i])
     {
-        if (s1[i] != s2[i])
-            return (unsigned char)s1[i] - (unsigned char)s2[i];
-        if (s1[i] == '\0')
-            break;
+        dest[i] = src[i];
+        i++;
     }
+    dest[i] = '\0';
     
-    return 0;
+    return (dest);
 }
 
 /**
- * print_prompt - Prints the shell prompt
+ * _strcat - Concatenate strings
+ * @dest: Destination
+ * @src: Source
+ * Return: Pointer to dest
  */
-void print_prompt(void)
+char *_strcat(char *dest, char *src)
 {
-    write(STDOUT_FILENO, ":) ", 3);
-}
-
-/**
- * handle_eof - Handles end of file (Ctrl+D)
- * @input: Input string to free
- */
-void handle_eof(char *input)
-{
-    free(input);
-    if (isatty(STDIN_FILENO))
-        write(STDOUT_FILENO, "\n", 1);
-    exit(0);
-}
-
-/**
- * remove_comments - Removes comments from input
- * @input: Input string
- */
-void remove_comments(char *input)
-{
-    int i;
+    int dest_len = _strlen(dest);
+    int i = 0;
     
-    for (i = 0; input[i] != '\0'; i++)
+    while (src[i])
     {
-        if (input[i] == '#')
-        {
-            if (i == 0 || input[i - 1] == ' ' || input[i - 1] == '\t')
-            {
-                input[i] = '\0';
-                break;
-            }
-        }
+        dest[dest_len + i] = src[i];
+        i++;
     }
+    dest[dest_len + i] = '\0';
+    
+    return (dest);
 }

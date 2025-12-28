@@ -1,69 +1,103 @@
 #include "shell.h"
 
 /**
- * handle_command_error - Handles command not found errors
- * @command: Command that wasn't found
+ * execute_command - Execute a command
+ * @args: Array of arguments
+ * Return: 1 to continue, 0 to exit
  */
-static void handle_command_error(char *command)
+int execute_command(char **args)
 {
-    struct stat st;
+    pid_t pid;
+    int status;
+    char *full_path;
     
-    if (is_absolute_path(command))
+    if (args[0] == NULL)
+        return (1);
+    
+    /* Handle built-in commands */
+    if (is_builtin(args[0]))
+        return (handle_builtin(args));
+    
+    /* Find command in PATH before forking */
+    full_path = find_in_path(args[0]);
+    if (full_path == NULL)
     {
-        if (stat(command, &st) == -1)
+        print_error("hsh", args[0]);
+        return (1);
+    }
+    
+    /* Command exists, now fork */
+    pid = fork();
+    if (pid == 0)
+    {
+        /* Child process */
+        if (execve(full_path, args, environ) == -1)
         {
-            write(STDERR_FILENO, command, _strlen(command));
-            write(STDERR_FILENO, ": No such file or directory\n", 28);
+            perror("hsh");
+            free(full_path);
+            exit(EXIT_FAILURE);
         }
-        else if (access(command, X_OK) == -1)
-        {
-            write(STDERR_FILENO, command, _strlen(command));
-            write(STDERR_FILENO, ": Permission denied\n", 20);
-        }
+    }
+    else if (pid < 0)
+    {
+        /* Fork failed */
+        perror("hsh");
+        free(full_path);
     }
     else
     {
-        write(STDERR_FILENO, command, _strlen(command));
-        write(STDERR_FILENO, ": command not found\n", 20);
+        /* Parent process */
+        waitpid(pid, &status, 0);
+        free(full_path);
     }
+    
+    return (1);
 }
 
 /**
- * execute_command - Executes a command with arguments
- * @args: Array of arguments (args[0] is the command)
+ * handle_builtin - Handle built-in commands
+ * @args: Array of arguments
+ * Return: 1 to continue, 0 to exit
  */
-void execute_command(char **args)
+int handle_builtin(char **args)
 {
-    char *command_path;
-    pid_t pid;
-    int status;
+    if (_strcmp(args[0], "exit") == 0)
+        return (exit_shell(args));
+    else if (_strcmp(args[0], "env") == 0)
+        return (print_env(args));
+    else if (_strcmp(args[0], "cd") == 0)
+        return (change_dir(args));
     
-    if (args == NULL || args[0] == NULL)
-        return;
+    return (1);
+}
+
+/**
+ * exit_shell - Exit the shell
+ * @args: Arguments
+ * Return: 0 to exit
+ */
+int exit_shell(char **args)
+{
+    (void)args;
+    return (0);
+}
+
+/**
+ * print_env - Print environment variables
+ * @args: Arguments
+ * Return: 1
+ */
+int print_env(char **args)
+{
+    char **env = environ;
     
-    command_path = find_in_path(args[0]);
-    if (command_path == NULL)
+    (void)args;
+    
+    while (*env)
     {
-        handle_command_error(args[0]);
-        return;
+        printf("%s\n", *env);
+        env++;
     }
     
-    pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        free(command_path);
-        return;
-    }
-    
-    if (pid == 0)
-    {
-        execve(command_path, args, environ);
-        perror(args[0]);
-        free(command_path);
-        exit(EXIT_FAILURE);
-    }
-    
-    waitpid(pid, &status, 0);
-    free(command_path);
+    return (1);
 }

@@ -1,100 +1,90 @@
 #include "shell.h"
 
 /**
- * _strlen - Returns the length of a string
- * @s: The string to measure
- * Return: Length of the string
+ * display_prompt - Display shell prompt
  */
-int _strlen(const char *s)
+void display_prompt(void)
 {
-    int len = 0;
-    
-    if (s == NULL)
-        return (0);
-        
-    while (s[len] != '\0')
-        len++;
-    
-    return (len);
+    printf("$ ");
+    fflush(stdout);
 }
 
 /**
- * _strdup - Duplicates a string
- * @str: The string to duplicate
- * Return: Pointer to the duplicated string
+ * read_input - Read input from stdin
+ * Return: Input string
  */
-char *_strdup(const char *str)
+char *read_input(void)
 {
-    char *dup;
-    int i, len;
+    char *line = NULL;
+    size_t bufsize = 0;
+    ssize_t nread;
     
-    if (str == NULL)
-        return (NULL);
-    
-    len = _strlen(str);
-    dup = malloc(sizeof(char) * (len + 1));
-    
-    if (dup == NULL)
-        return (NULL);
-    
-    for (i = 0; i <= len; i++)
-        dup[i] = str[i];
-    
-    return (dup);
-}
-
-/**
- * _strcpy - Copies a string
- * @dest: Destination buffer
- * @src: Source string
- * Return: Pointer to dest
- */
-char *_strcpy(char *dest, const char *src)
-{
-    int i = 0;
-    
-    while (src[i] != '\0')
+    nread = getline(&line, &bufsize, stdin);
+    if (nread == -1)
     {
-        dest[i] = src[i];
-        i++;
+        free(line);
+        return (NULL);
     }
-    dest[i] = '\0';
     
-    return (dest);
+    /* Remove trailing newline */
+    if (nread > 0 && line[nread - 1] == '\n')
+        line[nread - 1] = '\0';
+    
+    return (line);
 }
 
 /**
- * _strcat - Concatenates two strings
- * @dest: Destination string
- * @src: Source string
- * Return: Pointer to dest
+ * free_args - Free allocated arguments array
+ * @args: Arguments array
  */
-char *_strcat(char *dest, const char *src)
+void free_args(char **args)
 {
-    int dest_len = _strlen(dest);
     int i;
     
-    for (i = 0; src[i] != '\0'; i++)
-        dest[dest_len + i] = src[i];
+    if (args == NULL)
+        return;
     
-    dest[dest_len + i] = '\0';
+    for (i = 0; args[i] != NULL; i++)
+        free(args[i]);
     
-    return (dest);
+    free(args);
 }
 
 /**
- * _strcmp - Compares two strings
- * @s1: First string
- * @s2: Second string
- * Return: 0 if equal, negative if s1 < s2, positive if s1 > s2
+ * print_error - Print error message in required format
+ * @program: Program name
+ * @command: Command that failed
  */
-int _strcmp(const char *s1, const char *s2)
+void print_error(char *program, char *command)
 {
-    while (*s1 && (*s1 == *s2))
+    fprintf(stderr, "%s: 1: %s: not found\n", program, command);
+}
+
+/**
+ * change_dir - Change directory built-in
+ * @args: Arguments
+ * Return: 1
+ */
+int change_dir(char **args)
+{
+    char *dir = args[1];
+    char cwd[PATH_MAX];
+    
+    if (dir == NULL)
     {
-        s1++;
-        s2++;
+        dir = getenv("HOME");
+        if (dir == NULL)
+            dir = "/";
     }
     
-    return *(unsigned char *)s1 - *(unsigned char *)s2;
+    if (chdir(dir) != 0)
+    {
+        perror("cd");
+        return (1);
+    }
+    
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+        setenv("PWD", cwd, 1);
+    
+    return (1);
 }
