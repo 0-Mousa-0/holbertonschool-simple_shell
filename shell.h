@@ -24,11 +24,9 @@ int handle_builtin(char **args);
 int exit_shell(char **args);
 int print_env(char **args);
 int change_dir(char **args);
-int print_help(char **args);
 
 /* Path handling */
 char *find_executable(char *command);
-int check_command_exists(char *command);
 
 /* Utility functions */
 void free_args(char **args);
