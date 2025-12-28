@@ -13,7 +13,7 @@
 
 extern char **environ;
 
-/* Function prototypes */
+/* Main shell functions */
 void display_prompt(void);
 char *read_input(void);
 char **parse_input(char *input);
@@ -28,7 +28,7 @@ int print_help(char **args);
 
 /* Path handling */
 char *find_executable(char *command);
-char *find_in_path(char *command);
+int check_command_exists(char *command);
 
 /* Utility functions */
 void free_args(char **args);
@@ -41,10 +41,10 @@ char *_strdup(const char *str);
 int _strcmp(const char *s1, const char *s2);
 char *_strcpy(char *dest, const char *src);
 char *_strcat(char *dest, const char *src);
-int _strncmp(const char *s1, const char *s2, size_t n);
-char *_getenv(const char *name);
 
-/* Helper functions */
+/* Environment functions */
+char *_getenv(const char *name);
+int _strncmp(const char *s1, const char *s2, size_t n);
 int is_path_command(const char *command);
 char *build_full_path(const char *dir, const char *command);
 
