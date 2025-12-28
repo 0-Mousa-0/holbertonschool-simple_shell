@@ -27,8 +27,8 @@ if (path == NULL)
 return (NULL);
 
 /* If PATH is empty string, command not found */
-if (path[0] == '\0')
-return (NULL);
+/*if (path[0] == '')
+return (NULL);*/
 
 path_copy = _strdup(path);
 if (!path_copy)
