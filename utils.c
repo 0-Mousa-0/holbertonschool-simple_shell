@@ -11,7 +11,7 @@ void display_prompt(void)
 
 /**
  * read_input - Read input from stdin
- * Return: Input string
+ * Return: Input string or NULL on EOF
  */
 char *read_input(void)
 {
@@ -26,7 +26,6 @@ char *read_input(void)
         return (NULL);
     }
     
-    /* Remove trailing newline */
     if (nread > 0 && line[nread - 1] == '\n')
         line[nread - 1] = '\0';
     
@@ -34,14 +33,14 @@ char *read_input(void)
 }
 
 /**
- * free_args - Free allocated arguments array
- * @args: Arguments array
+ * free_args - Free arguments array
+ * @args: Array to free
  */
 void free_args(char **args)
 {
     int i;
     
-    if (args == NULL)
+    if (!args)
         return;
     
     for (i = 0; args[i] != NULL; i++)
@@ -69,22 +68,29 @@ int change_dir(char **args)
 {
     char *dir = args[1];
     char cwd[PATH_MAX];
+    char *home;
     
     if (dir == NULL)
     {
-        dir = getenv("HOME");
-        if (dir == NULL)
+        home = _getenv("HOME");
+        if (home)
+            dir = home;
+        else
             dir = "/";
     }
     
     if (chdir(dir) != 0)
     {
-        perror("cd");
+        fprintf(stderr, "cd: can't cd to %s\n", dir);
         return (1);
     }
     
+    /* Get and optionally print new directory */
     if (getcwd(cwd, sizeof(cwd)) != NULL)
-        setenv("PWD", cwd, 1);
+    {
+        /* In simple shell, we don't update PWD env variable */
+        return (1);
+    }
     
     return (1);
 }
