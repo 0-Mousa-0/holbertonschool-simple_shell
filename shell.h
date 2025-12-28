@@ -17,7 +17,7 @@ extern char **environ;
 void display_prompt(void);
 char *read_input(void);
 char **parse_input(char *input);
-int execute_command(char **args);
+int execute_command(char **args, char *prog_name);
 
 /* Built-in functions */
 int handle_builtin(char **args);
