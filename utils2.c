@@ -3,19 +3,19 @@
 /**
  * _strlen - Get string length
  * @s: String
- * Return: Length
+ * Return: Length of string
  */
 int _strlen(const char *s)
 {
-    int len = 0;
-    
-    if (!s)
-        return (0);
-    
-    while (s[len])
-        len++;
-    
-    return (len);
+int len = 0;
+
+if (!s)
+return (0);
+
+while (s[len])
+len++;
+
+return (len);
 }
 
 /**
@@ -25,21 +25,21 @@ int _strlen(const char *s)
  */
 char *_strdup(const char *str)
 {
-    char *dup;
-    int len, i;
-    
-    if (!str)
-        return (NULL);
-    
-    len = _strlen(str);
-    dup = malloc(len + 1);
-    if (!dup)
-        return (NULL);
-    
-    for (i = 0; i <= len; i++)
-        dup[i] = str[i];
-    
-    return (dup);
+char *dup;
+int len, i;
+
+if (!str)
+return (NULL);
+
+len = _strlen(str);
+dup = malloc(len + 1);
+if (!dup)
+return (NULL);
+
+for (i = 0; i <= len; i++)
+dup[i] = str[i];
+
+return (dup);
 }
 
 /**
@@ -50,13 +50,13 @@ char *_strdup(const char *str)
  */
 int _strcmp(const char *s1, const char *s2)
 {
-    while (*s1 && *s2 && *s1 == *s2)
-    {
-        s1++;
-        s2++;
-    }
-    
-    return ((unsigned char)*s1 - (unsigned char)*s2);
+while (*s1 && *s2 && *s1 == *s2)
+{
+s1++;
+s2++;
+}
+
+return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
 /**
@@ -67,16 +67,16 @@ int _strcmp(const char *s1, const char *s2)
  */
 char *_strcpy(char *dest, const char *src)
 {
-    int i = 0;
-    
-    while (src[i])
-    {
-        dest[i] = src[i];
-        i++;
-    }
-    dest[i] = '\0';
-    
-    return (dest);
+int i = 0;
+
+while (src[i])
+{
+dest[i] = src[i];
+i++;
+}
+dest[i] = '\0';
+
+return (dest);
 }
 
 /**
@@ -87,15 +87,15 @@ char *_strcpy(char *dest, const char *src)
  */
 char *_strcat(char *dest, const char *src)
 {
-    int dest_len = _strlen(dest);
-    int i = 0;
-    
-    while (src[i])
-    {
-        dest[dest_len + i] = src[i];
-        i++;
-    }
-    dest[dest_len + i] = '\0';
-    
-    return (dest);
+int dest_len = _strlen(dest);
+int i = 0;
+
+while (src[i])
+{
+dest[dest_len + i] = src[i];
+i++;
+}
+dest[dest_len + i] = '\0';
+
+return (dest);
 }
