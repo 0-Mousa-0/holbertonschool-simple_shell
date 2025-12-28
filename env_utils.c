@@ -7,22 +7,22 @@
  */
 char *_getenv(const char *name)
 {
-    char **env = environ;
-    size_t name_len;
-    
-    if (!name || !env)
-        return (NULL);
-    
-    name_len = _strlen(name);
-    
-    while (*env)
-    {
-        if (_strncmp(*env, name, name_len) == 0 && (*env)[name_len] == '=')
-            return (*env + name_len + 1);
-        env++;
-    }
-    
-    return (NULL);
+char **env = environ;
+size_t name_len;
+
+if (!name || !env)
+return (NULL);
+
+name_len = _strlen(name);
+
+while (*env)
+{
+if (_strncmp(*env, name, name_len) == 0 && (*env)[name_len] == '=')
+return (*env + name_len + 1);
+env++;
+}
+
+return (NULL);
 }
 
 /**
@@ -34,18 +34,18 @@ char *_getenv(const char *name)
  */
 int _strncmp(const char *s1, const char *s2, size_t n)
 {
-    size_t i;
-    
-    if (!s1 || !s2)
-        return (-1);
-    
-    for (i = 0; i < n; i++)
-    {
-        if (s1[i] != s2[i] || s1[i] == '\0')
-            return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-    }
-    
-    return (0);
+size_t i;
+
+if (!s1 || !s2)
+return (-1);
+
+for (i = 0; i < n; i++)
+{
+if (s1[i] != s2[i] || s1[i] == '\0')
+return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+
+return (0);
 }
 
 /**
@@ -55,18 +55,18 @@ int _strncmp(const char *s1, const char *s2, size_t n)
  */
 int is_path_command(const char *command)
 {
-    int i = 0;
-    
-    if (!command)
-        return (0);
-    
-    while (command[i])
-    {
-        if (command[i] == '/')
-            return (1);
-        i++;
-    }
-    return (0);
+int i = 0;
+
+if (!command)
+return (0);
+
+while (command[i])
+{
+if (command[i] == '/')
+return (1);
+i++;
+}
+return (0);
 }
 
 /**
@@ -77,23 +77,32 @@ int is_path_command(const char *command)
  */
 char *build_full_path(const char *dir, const char *command)
 {
-    char *full_path;
-    int dir_len, cmd_len;
-    
-    if (!dir || !command)
-        return (NULL);
-    
-    dir_len = _strlen(dir);
-    cmd_len = _strlen(command);
-    
-    full_path = malloc(dir_len + cmd_len + 2);
-    if (!full_path)
-        return (NULL);
-    
-    _strcpy(full_path, dir);
-    if (dir_len > 0 && dir[dir_len - 1] != '/')
-        _strcat(full_path, "/");
-    _strcat(full_path, command);
-    
-    return (full_path);
+char *full_path;
+int dir_len, cmd_len;
+
+if (!command)
+return (NULL);
+
+cmd_len = _strlen(command);
+
+if (dir == NULL || dir[0] == '\0')
+{
+full_path = malloc(cmd_len + 1);
+if (!full_path)
+return (NULL);
+_strcpy(full_path, command);
+return (full_path);
+}
+
+dir_len = _strlen(dir);
+full_path = malloc(dir_len + cmd_len + 2);
+if (!full_path)
+return (NULL);
+
+_strcpy(full_path, dir);
+if (dir_len > 0 && dir[dir_len - 1] != '/')
+_strcat(full_path, "/");
+_strcat(full_path, command);
+
+return (full_path);
 }
