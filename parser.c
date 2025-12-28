@@ -3,7 +3,7 @@
 /**
  * parse_input - Parse input line into arguments
  * @input: Input string
- * Return: Array of arguments
+ * Return: Array of arguments or NULL
  */
 char **parse_input(char *input)
 {
@@ -14,48 +14,53 @@ char **parse_input(char *input)
     
     if (!args)
     {
-        fprintf(stderr, "Allocation error\n");
+        fprintf(stderr, "Error: malloc failed\n");
         return (NULL);
     }
     
-    token = strtok(input, " \t\r\n\a");
+    token = strtok(input, " \t\r\n");
     while (token != NULL)
     {
-        args[position] = _strdup(token);
-        if (!args[position])
+        if (token[0] != '\0')
         {
-            free_args(args);
-            return (NULL);
-        }
-        position++;
-        
-        if (position >= bufsize)
-        {
-            bufsize += 64;
-            args = realloc(args, bufsize * sizeof(char *));
-            if (!args)
+            args[position] = _strdup(token);
+            if (!args[position])
             {
-                fprintf(stderr, "Allocation error\n");
+                free_args(args);
                 return (NULL);
             }
+            position++;
+            
+            if (position >= bufsize)
+            {
+                bufsize += 64;
+                args = realloc(args, bufsize * sizeof(char *));
+                if (!args)
+                {
+                    fprintf(stderr, "Error: malloc failed\n");
+                    return (NULL);
+                }
+            }
         }
-        
-        token = strtok(NULL, " \t\r\n\a");
+        token = strtok(NULL, " \t\r\n");
     }
-    args[position] = NULL;
     
+    args[position] = NULL;
     return (args);
 }
 
 /**
- * is_builtin - Check if command is a built-in
+ * is_builtin - Check if command is built-in
  * @command: Command to check
  * Return: 1 if built-in, 0 otherwise
  */
 int is_builtin(char *command)
 {
-    char *builtins[] = {"exit", "env", "cd", "help", NULL};
+    char *builtins[] = {"exit", "env", "cd", NULL};
     int i;
+    
+    if (!command)
+        return (0);
     
     for (i = 0; builtins[i]; i++)
     {
