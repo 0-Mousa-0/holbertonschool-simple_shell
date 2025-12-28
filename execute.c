@@ -13,8 +13,6 @@ int handle_builtin(char **args)
         return (print_env(args));
     else if (_strcmp(args[0], "cd") == 0)
         return (change_dir(args));
-    else if (_strcmp(args[0], "help") == 0)
-        return (print_help(args));
     
     return (1);
 }
@@ -67,30 +65,35 @@ int execute_command(char **args)
     if (is_builtin(args[0]))
         return (handle_builtin(args));
     
+    /* CRITICAL: Check if command exists BEFORE forking */
     full_path = find_executable(args[0]);
     if (full_path == NULL)
     {
         print_error("hsh", args[0]);
-        return (1);
+        return (1);  /* Return without forking */
     }
     
+    /* Only fork if command exists */
     pid = fork();
     if (pid == 0)
     {
+        /* Child process */
         if (execve(full_path, args, environ) == -1)
         {
-            print_error("hsh", args[0]);
+            /* If execve fails */
             free(full_path);
             _exit(EXIT_FAILURE);
         }
     }
     else if (pid < 0)
     {
+        /* Fork error */
         perror("hsh");
         free(full_path);
     }
     else
     {
+        /* Parent process */
         waitpid(pid, &status, 0);
         free(full_path);
     }
