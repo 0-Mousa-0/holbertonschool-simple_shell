@@ -14,7 +14,6 @@ char **args = NULL;
 int status = 1;
 
 (void)argc;
-(void)argv;
 
 if (env != NULL)
 environ = env;
@@ -36,7 +35,7 @@ free_args(args);
 continue;
 }
 
-status = execute_command(args);
+status = execute_command(args, argv[0]);
 
 free(input);
 free_args(args);
