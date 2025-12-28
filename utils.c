@@ -51,7 +51,7 @@ free(args);
 
 /**
  * print_error - Print error message
- * @program: Program name
+ * @program: Program name (from argv[0])
  * @command: Command that failed
  */
 void print_error(char *program, char *command)
