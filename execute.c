@@ -8,7 +8,9 @@
 int handle_builtin(char **args)
 {
 if (_strcmp(args[0], "exit") == 0)
-return (-1);  /* Signal to exit */
+{
+return (-1);  /* Always return -1 for exit */
+}
 else if (_strcmp(args[0], "env") == 0)
 return (print_env(args));
 else if (_strcmp(args[0], "cd") == 0)
@@ -41,7 +43,7 @@ return (1);
  * execute_command - Execute a command
  * @args: Array of arguments
  * @prog_name: Program name (argv[0])
- * Return: 1 to continue, -1 to exit, 127 for command not found
+ * Return: 1 to continue, -1 to exit
  */
 int execute_command(char **args, char *prog_name)
 {
@@ -52,14 +54,16 @@ char *full_path;
 if (args[0] == NULL)
 return (1);
 
+/* Check for built-in FIRST */
 if (is_builtin(args[0]))
 return (handle_builtin(args));
 
+/* Only check external commands if not built-in */
 full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
 print_error(prog_name, args[0]);
-return (1);  /* Continue shell, don't exit */
+return (1);  /* Command failed but continue shell */
 }
 
 pid = fork();
