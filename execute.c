@@ -8,15 +8,24 @@
 int handle_builtin(char **args)
 {
 if (_strcmp(args[0], "exit") == 0)
-{
-return (-1);  /* Always return -1 for exit */
-}
+return (-1);
 else if (_strcmp(args[0], "env") == 0)
 return (print_env(args));
 else if (_strcmp(args[0], "cd") == 0)
 return (change_dir(args));
 
 return (1);
+}
+
+/**
+ * exit_shell - Exit shell
+ * @args: Arguments
+ * Return: -1 to signal exit
+ */
+int exit_shell(char **args)
+{
+(void)args;
+return (-1);
 }
 
 /**
@@ -43,7 +52,7 @@ return (1);
  * execute_command - Execute a command
  * @args: Array of arguments
  * @prog_name: Program name (argv[0])
- * Return: 1 to continue, -1 to exit
+ * Return: Exit status of command, or -1 for exit built-in
  */
 int execute_command(char **args, char *prog_name)
 {
@@ -52,18 +61,16 @@ int status;
 char *full_path;
 
 if (args[0] == NULL)
-return (1);
+return (0);
 
-/* Check for built-in FIRST */
 if (is_builtin(args[0]))
 return (handle_builtin(args));
 
-/* Only check external commands if not built-in */
 full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
 print_error(prog_name, args[0]);
-return (1);  /* Command failed but continue shell */
+return (127);
 }
 
 pid = fork();
@@ -80,12 +87,22 @@ else if (pid < 0)
 {
 perror(prog_name);
 free(full_path);
+return (1);
 }
 else
 {
 waitpid(pid, &status, 0);
 free(full_path);
+
+if (WIFEXITED(status))
+{
+return (WEXITSTATUS(status));
+}
+else
+{
+return (1);
+}
 }
 
-return (1);
+return (0);
 }
