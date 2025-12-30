@@ -3,12 +3,12 @@
 /**
  * handle_builtin - Handle built-in commands
  * @args: Array of arguments
- * Return: 1 to continue, -1 to exit
+ * Return: 1 to continue, 0 for exit
  */
 int handle_builtin(char **args)
 {
 if (_strcmp(args[0], "exit") == 0)
-return (-1);
+return (0);  /* Return 0 for exit built-in */
 else if (_strcmp(args[0], "env") == 0)
 return (print_env(args));
 else if (_strcmp(args[0], "cd") == 0)
@@ -20,12 +20,12 @@ return (1);
 /**
  * exit_shell - Exit shell
  * @args: Arguments
- * Return: -1 to signal exit
+ * Return: 0 to signal exit
  */
 int exit_shell(char **args)
 {
 (void)args;
-return (-1);
+return (0);
 }
 
 /**
@@ -52,7 +52,7 @@ return (1);
  * execute_command - Execute a command
  * @args: Array of arguments
  * @prog_name: Program name (argv[0])
- * Return: Exit status of command, or -1 for exit built-in
+ * Return: Exit status of command, or 0 for exit built-in
  */
 int execute_command(char **args, char *prog_name)
 {
@@ -70,7 +70,7 @@ full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
 print_error(prog_name, args[0]);
-return (127);
+return (127);  /* Command not found - return 127 */
 }
 
 pid = fork();
@@ -96,7 +96,7 @@ free(full_path);
 
 if (WIFEXITED(status))
 {
-return (WEXITSTATUS(status));
+return (WEXITSTATUS(status));  /* Return actual exit status */
 }
 else
 {
