@@ -20,12 +20,12 @@ return (1);
 /**
  * exit_shell - Exit shell
  * @args: Arguments
- * Return: 0 to exit
+ * Return: Never returns (exits the shell)
  */
 int exit_shell(char **args)
 {
 (void)args;
-return (0);
+exit(0);  /* Actually exit the program */
 }
 
 /**
@@ -70,7 +70,7 @@ full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
 print_error(prog_name, args[0]);
-return (127);  /* Return 127 for command not found */
+return (127);
 }
 
 pid = fork();
