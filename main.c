@@ -11,21 +11,21 @@ int main(int argc, char **argv, char **env)
 {
 char *input = NULL;
 char **args = NULL;
-int status;
+int status = 0;  /* Default exit status */
 
 (void)argc;
 
 if (env != NULL)
 environ = env;
 
-while (1)  /* Infinite loop, exit breaks it */
+while (1)
 {
 if (isatty(STDIN_FILENO))
 display_prompt();
 
 input = read_input();
 if (input == NULL)
-break;  /* EOF exits shell */
+break;  /* EOF exits with current status */
 
 args = parse_input(input);
 if (args == NULL || args[0] == NULL)
@@ -40,9 +40,12 @@ status = execute_command(args, argv[0]);
 free(input);
 free_args(args);
 
-if (status == -1)  /* exit command */
+if (status == 0 && args[0] != NULL && _strcmp(args[0], "exit") == 0)
+{
+/* Exit built-in was called */
 break;
 }
+}
 
-return (0);
+return (status);  /* Return last command status */
 }
