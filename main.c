@@ -12,7 +12,6 @@ int main(int argc, char **argv, char **env)
 char *input = NULL;
 char **args = NULL;
 int status = 0;
-int exit_flag = 0;
 
 (void)argc;
 
@@ -36,24 +35,19 @@ free_args(args);
 continue;
 }
 
-/* Check for exit BEFORE calling execute_command */
+/* Check for exit command */
 if (_strcmp(args[0], "exit") == 0)
 {
-exit_flag = 1;
-status = 0;
+free(input);
+free_args(args);
+break;  /* Exit with current status */
 }
-else
-{
+
+/* Execute command and save its status */
 status = execute_command(args, argv[0]);
-}
 
 free(input);
 free_args(args);
-
-if (exit_flag)
-{
-break;
-}
 }
 
 return (status);

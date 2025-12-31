@@ -24,6 +24,7 @@ if (pid == 0)
 {
 if (execve(args[0], args, environ) == -1)
 {
+/* This shouldn't happen if stat succeeded, but just in case */
 fprintf(stderr, "%s: 1: %s: not found\n", prog_name, args[0]);
 _exit(127);
 }
@@ -37,14 +38,35 @@ else
 {
 waitpid(pid, &status, 0);
 if (WIFEXITED(status))
+{
 return (WEXITSTATUS(status));
+}
 return (1);
 }
 }
 else
 {
-fprintf(stderr, "%s: 1: %s: not found\n", prog_name, args[0]);
-return (127);
+/* Command exists but not executable, or doesn't exist */
+/* Let execve handle the error and return proper status */
+pid = fork();
+if (pid == 0)
+{
+execve(args[0], args, environ);
+/* If execve fails, it won't return */
+exit(127);
+}
+else if (pid < 0)
+{
+perror(prog_name);
+return (1);
+}
+else
+{
+waitpid(pid, &status, 0);
+if (WIFEXITED(status))
+return (WEXITSTATUS(status));
+return (1);
+}
 }
 }
 
