@@ -1,39 +1,53 @@
 #include "shell.h"
 
-char **parse_input(char *input)
+/**
+ * parse_line - Parse a line into arguments
+ * @line: The line to parse
+ * Return: Array of arguments
+ */
+char **parse_line(char *line)
 {
-int bufsize = 64;
-int position = 0;
-char **args = malloc(bufsize * sizeof(char *));
+char **args = malloc(64 * sizeof(char *));
 char *token;
+int i = 0;
 
 if (!args)
+{
+perror("malloc");
 return (NULL);
+}
 
-token = strtok(input, " \t\r\n");
-while (token != NULL)
+token = strtok(line, " \t\n");
+while (token)
 {
-if (token[0] != '\0')
+args[i] = strdup(token);
+if (!args[i])
 {
-args[position] = _strdup(token);
-if (!args[position])
-{
+perror("strdup");
 free_args(args);
 return (NULL);
 }
-position++;
+i++;
+token = strtok(NULL, " \t\n");
+}
+args[i] = NULL;
 
-if (position >= bufsize)
-{
-bufsize += 64;
-args = realloc(args, bufsize * sizeof(char *));
-if (!args)
-return (NULL);
-}
-}
-token = strtok(NULL, " \t\r\n");
-}
-
-args[position] = NULL;
 return (args);
+}
+
+/**
+ * free_args - Free an array of arguments
+ * @args: Array to free
+ */
+void free_args(char **args)
+{
+int i;
+
+if (!args)
+return;
+
+for (i = 0; args[i]; i++)
+free(args[i]);
+
+free(args);
 }
