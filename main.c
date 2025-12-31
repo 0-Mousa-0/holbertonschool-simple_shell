@@ -2,7 +2,7 @@
 
 /**
  * main - Entry point for the simple shell
- * * Return: 0 on success
+ * Return: The last exit status
  */
 int main(void)
 {
@@ -11,47 +11,42 @@ int main(void)
 	ssize_t nread;
 	char **args;
 	char *full_path;
+	int last_status = 0;
 
 	while (1)
 	{
-		/* Print prompt only in interactive mode */
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, ":) ", 3);
 
 		nread = getline(&line, &len, stdin);
-		if (nread == -1) /* Handle EOF (Ctrl+D) */
+		if (nread == -1)
 		{
 			free(line);
-			exit(0);
+			exit(last_status); /* Exit with the status of the last command */
 		}
 
-		/* Remove newline character from getline */
 		if (nread > 0 && line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
 		args = tokenize(line);
-		/* If line was empty or only spaces, tokenize returns NULL or args[0] is NULL */
 		if (args && args[0])
 		{
 			full_path = find_path(args[0]);
-
 			if (full_path != NULL)
 			{
-				/* Case: Command found OR is a valid path. OK to fork. */
-				execute(args, full_path);
-
-				/* Only free full_path if it was allocated by find_path */
+				/* Capture exit status from the executed command */
+				last_status = execute(args, full_path);
 				if (full_path != args[0])
 					free(full_path);
 			}
 			else
 			{
-				/* CASE: Command not found. No fork is called. */
+				/* Command not found: Set status to 127 */
 				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+				last_status = 127;
 			}
 		}
 		free(args);
 	}
-	free(line);
-	return (0);
+	return (last_status);
 }
