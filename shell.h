@@ -9,21 +9,20 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-/* Function prototypes */
-char *read_line(void);
-char **parse_line(char *line);
-int execute_command(char **args);
-char *find_command(char *command);
-void free_args(char **args);
-int is_builtin(char *command);
-int handle_builtin(char **args);
-void print_error(char *command);
-
-/* Built-in commands */
-int shell_exit(char **args);
-int shell_env(char **args);
-
-/* Environment */
 extern char **environ;
+
+/* Main functions */
+void shell_loop(void);
+char **tokenize(char *line);
+int execute(char **args, char *path);
+char *find_path(char *command);
+
+/* Utility functions */
+char *_getenv(const char *name);
+int _strlen(char *s);
+char *_strdup(char *str);
+int _strcmp(char *s1, char *s2);
+char *_strcat(char *dest, char *src);
+char *_strcpy(char *dest, char *src);
 
 #endif
