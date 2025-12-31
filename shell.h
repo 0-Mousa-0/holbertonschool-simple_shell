@@ -35,7 +35,5 @@ int is_builtin(char *command);
 int _strlen(const char *s);
 char *_strdup(const char *str);
 int _strcmp(const char *s1, const char *s2);
-char *_strcpy(char *dest, const char *src);
-char *_strcat(char *dest, const char *src);
 
 #endif
