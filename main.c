@@ -1,42 +1,41 @@
 #include "shell.h"
 
-int main(int argc, char **argv, char **env)
+/**
+ * main - Simple shell main function
+ * Return: Always 0
+ */
+int main(void)
 {
-char *input = NULL;
-char **args = NULL;
+char *line;
+char **args;
 int status = 0;
-
-(void)argc;
-
-if (env != NULL)
-environ = env;
+int interactive = isatty(STDIN_FILENO);
 
 while (1)
 {
-if (isatty(STDIN_FILENO))
-display_prompt();
+if (interactive)
+write(STDOUT_FILENO, "$ ", 2);
 
-input = read_input();
-if (input == NULL)
-break;
-
-args = parse_input(input);
-if (args == NULL || args[0] == NULL)
+line = read_line();
+if (!line)
 {
-free(input);
-free_args(args);
+if (interactive)
+write(STDOUT_FILENO, "\n", 1);
+break;
+}
+
+args = parse_line(line);
+if (!args)
+{
+free(line);
 continue;
 }
 
-status = execute_command(args, argv[0]);
+if (args[0])
+status = execute_command(args);
 
-free(input);
+free(line);
 free_args(args);
-
-if (status == 0 && args[0] != NULL && _strcmp(args[0], "exit") == 0)
-{
-break;
-}
 }
 
 return (status);
