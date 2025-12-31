@@ -1,18 +1,16 @@
 #include "shell.h"
 
-void display_prompt(void)
-{
-printf("$ ");
-fflush(stdout);
-}
-
-char *read_input(void)
+/**
+ * read_line - Read a line from stdin
+ * Return: The line read
+ */
+char *read_line(void)
 {
 char *line = NULL;
-size_t bufsize = 0;
+size_t len = 0;
 ssize_t nread;
 
-nread = getline(&line, &bufsize, stdin);
+nread = getline(&line, &len, stdin);
 if (nread == -1)
 {
 free(line);
@@ -25,15 +23,16 @@ line[nread - 1] = '\0';
 return (line);
 }
 
-void free_args(char **args)
+/**
+ * print_error - Print command not found error
+ * @command: The command that wasn't found
+ */
+void print_error(char *command)
 {
-int i;
+char error_msg[256];
+int len;
 
-if (!args)
-return;
-
-for (i = 0; args[i] != NULL; i++)
-free(args[i]);
-
-free(args);
+(void)command;  /* Mark parameter as unused */
+len = snprintf(error_msg, sizeof(error_msg), "./hsh: No such file or directory\n");
+write(STDERR_FILENO, error_msg, len);
 }
