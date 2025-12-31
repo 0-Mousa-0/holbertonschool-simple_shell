@@ -1,21 +1,5 @@
 #include "shell.h"
 
-/**
- * handle_builtin - Handle built-in commands
- * @args: Array of arguments
- * Return: 1 to continue, 0 for exit
- */
-int handle_builtin(char **args)
-{
-if (_strcmp(args[0], "exit") == 0)
-return (0);  /* Return 0 for exit built-in */
-else if (_strcmp(args[0], "env") == 0)
-return (print_env(args));
-else if (_strcmp(args[0], "cd") == 0)
-return (change_dir(args));
-
-return (1);
-}
 
 /**
  * exit_shell - Exit shell
