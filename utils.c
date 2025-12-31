@@ -51,40 +51,10 @@ free(args);
 
 /**
  * print_error - Print error message
- * @program: Program name (from argv[0])
+ * @program: Program name
  * @command: Command that failed
  */
 void print_error(char *program, char *command)
 {
 fprintf(stderr, "%s: 1: %s: not found\n", program, command);
-}
-
-/**
- * change_dir - Change directory built-in
- * @args: Arguments
- * Return: 1
- */
-int change_dir(char **args)
-{
-char *dir = args[1];
-char cwd[PATH_MAX];
-char *home;
-
-if (dir == NULL)
-{
-home = _getenv("HOME");
-if (home)
-dir = home;
-else
-dir = "/";
-}
-
-if (chdir(dir) != 0)
-{
-fprintf(stderr, "cd: can't cd to %s\n", dir);
-return (1);
-}
-
-getcwd(cwd, sizeof(cwd));
-return (1);
 }
