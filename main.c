@@ -1,12 +1,5 @@
 #include "shell.h"
 
-/**
- * main - Simple shell entry point
- * @argc: Argument count
- * @argv: Argument vector
- * @env: Environment variables
- * Return: Exit status
- */
 int main(int argc, char **argv, char **env)
 {
 char *input = NULL;
@@ -35,19 +28,15 @@ free_args(args);
 continue;
 }
 
-/* Check for exit command */
-if (_strcmp(args[0], "exit") == 0)
-{
-free(input);
-free_args(args);
-break;  /* Exit with current status */
-}
-
-/* Execute command and save its status */
 status = execute_command(args, argv[0]);
 
 free(input);
 free_args(args);
+
+if (status == 0 && args[0] != NULL && _strcmp(args[0], "exit") == 0)
+{
+break;
+}
 }
 
 return (status);
