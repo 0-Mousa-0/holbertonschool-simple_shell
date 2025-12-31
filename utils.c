@@ -48,13 +48,3 @@ free(args[i]);
 
 free(args);
 }
-
-/**
- * print_error - Print error message
- * @program: Program name
- * @command: Command that failed
- */
-void print_error(char *program, char *command)
-{
-fprintf(stderr, "%s: 1: %s: not found\n", program, command);
-}

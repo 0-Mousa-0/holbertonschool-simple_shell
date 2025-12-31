@@ -20,7 +20,7 @@ while (token != NULL)
 {
 if (token[0] != '\0')
 {
-args[position] = _strdup(token);
+args[position] = strdup(token);
 if (!args[position])
 {
 free_args(args);
@@ -50,16 +50,27 @@ return (args);
  */
 int is_builtin(char *command)
 {
-char *builtins[] = {"exit", NULL};
-int i;
-
 if (!command)
 return (0);
 
-for (i = 0; builtins[i]; i++)
-{
-if (_strcmp(command, builtins[i]) == 0)
+if (_strcmp(command, "exit") == 0)
 return (1);
-}
+
 return (0);
+}
+
+/**
+ * _strcmp - Compare strings
+ * @s1: First string
+ * @s2: Second string
+ * Return: 0 if equal, difference otherwise
+ */
+int _strcmp(char *s1, char *s2)
+{
+int i = 0;
+
+while (s1[i] && s2[i] && s1[i] == s2[i])
+i++;
+
+return (s1[i] - s2[i]);
 }
