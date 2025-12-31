@@ -22,8 +22,6 @@ int execute_command(char **args, char *prog_name);
 /* Built-in functions */
 int handle_builtin(char **args);
 int exit_shell(char **args);
-int print_env(char **args);
-int change_dir(char **args);
 
 /* Path handling */
 char *find_executable(char *command);
@@ -39,11 +37,5 @@ char *_strdup(const char *str);
 int _strcmp(const char *s1, const char *s2);
 char *_strcpy(char *dest, const char *src);
 char *_strcat(char *dest, const char *src);
-
-/* Environment functions */
-char *_getenv(const char *name);
-int _strncmp(const char *s1, const char *s2, size_t n);
-int is_path_command(const char *command);
-char *build_full_path(const char *dir, const char *command);
 
 #endif
