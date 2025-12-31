@@ -1,18 +1,11 @@
 #include "shell.h"
 
-/**
- * display_prompt - Display shell prompt
- */
 void display_prompt(void)
 {
 printf("$ ");
 fflush(stdout);
 }
 
-/**
- * read_input - Read input from stdin
- * Return: Input string or NULL on EOF
- */
 char *read_input(void)
 {
 char *line = NULL;
@@ -32,10 +25,6 @@ line[nread - 1] = '\0';
 return (line);
 }
 
-/**
- * free_args - Free arguments array
- * @args: Array to free
- */
 void free_args(char **args)
 {
 int i;
