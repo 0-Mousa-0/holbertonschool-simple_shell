@@ -59,23 +59,18 @@ int execute_command(char **args, char *prog_name)
 pid_t pid;
 int status;
 char *full_path;
-
 if (args[0] == NULL)
 return (0);
-
 if (is_builtin(args[0]))
 return (handle_builtin(args));
-
 full_path = find_executable(args[0]);
 if (full_path == NULL)
 {
 print_error(prog_name, args[0]);
 return (127);  /* Command not found - return 127 */
 }
-
 pid = fork();
 if (pid == 0)
-{
 if (execve(full_path, args, environ) == -1)
 {
 print_error(prog_name, args[0]);
@@ -93,16 +88,10 @@ else
 {
 waitpid(pid, &status, 0);
 free(full_path);
-
 if (WIFEXITED(status))
-{
 return (WEXITSTATUS(status));  /* Return actual exit status */
-}
 else
-{
 return (1);
 }
-}
-
 return (0);
 }
