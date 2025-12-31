@@ -4,7 +4,7 @@
  * execute_command - Execute a command
  * @args: Array of arguments
  * @prog_name: Program name (argv[0])
- * Return: Exit status of command, 0 for exit
+ * Return: Exit status of command
  */
 int execute_command(char **args, char *prog_name)
 {
@@ -13,9 +13,6 @@ int status;
 struct stat st;
 
 if (args[0] == NULL)
-return (0);
-
-if (_strcmp(args[0], "exit") == 0)
 return (0);
 
 if (strchr(args[0], '/') != NULL)
