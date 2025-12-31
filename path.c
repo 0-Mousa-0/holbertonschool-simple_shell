@@ -9,11 +9,14 @@ char *find_executable(char *command)
 {
 struct stat st;
 char *path, *path_copy, *dir, *full_path;
+int i;
 
 if (!command || command[0] == '\0')
 return (NULL);
 
-if (strchr(command, '/') != NULL)
+/* Check if command contains '/' */
+for (i = 0; command[i]; i++)
+if (command[i] == '/')
 {
 if (stat(command, &st) == 0 && (st.st_mode & S_IXUSR))
 return (_strdup(command));
@@ -33,13 +36,15 @@ while (dir != NULL)
 {
 if (dir[0] != '\0')
 {
-full_path = malloc(strlen(dir) + strlen(command) + 2);
+full_path = malloc(_strlen(dir) + _strlen(command) + 2);
 if (!full_path)
 {
 free(path_copy);
 return (NULL);
 }
-sprintf(full_path, "%s/%s", dir, command);
+_strcpy(full_path, dir);
+_strcat(full_path, "/");
+_strcat(full_path, command);
 if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
 {
 free(path_copy);
