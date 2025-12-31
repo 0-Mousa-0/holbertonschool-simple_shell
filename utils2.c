@@ -1,28 +1,53 @@
 #include "shell.h"
 
+/**
+ * _strlen - Calculate length of string
+ * @s: String
+ * Return: Length
+ */
 int _strlen(char *s)
 {
 int len = 0;
 
-if (!s)
-return (0);
-
-while (s[len])
+while (s && s[len])
 len++;
 
 return (len);
 }
 
+/**
+ * _strcmp - Compare two strings
+ * @s1: First string
+ * @s2: Second string
+ * Return: Difference
+ */
+int _strcmp(char *s1, char *s2)
+{
+while (*s1 && (*s1 == *s2))
+{
+s1++;
+s2++;
+}
+
+return (*(unsigned char *)s1 - *(unsigned char *)s2);
+}
+
+/**
+ * _strdup - Duplicate a string
+ * @str: String to duplicate
+ * Return: Duplicated string
+ */
 char *_strdup(char *str)
 {
 char *dup;
-int len, i;
+int i, len;
 
 if (!str)
 return (NULL);
 
 len = _strlen(str);
 dup = malloc(len + 1);
+
 if (!dup)
 return (NULL);
 
@@ -30,43 +55,4 @@ for (i = 0; i <= len; i++)
 dup[i] = str[i];
 
 return (dup);
-}
-
-int _strcmp(char *s1, char *s2)
-{
-int i = 0;
-
-while (s1[i] && s2[i] && s1[i] == s2[i])
-i++;
-
-return (s1[i] - s2[i]);
-}
-
-char *_strcpy(char *dest, char *src)
-{
-int i = 0;
-
-while (src[i])
-{
-dest[i] = src[i];
-i++;
-}
-dest[i] = '\0';
-
-return (dest);
-}
-
-char *_strcat(char *dest, char *src)
-{
-int dest_len = _strlen(dest);
-int i = 0;
-
-while (src[i])
-{
-dest[dest_len + i] = src[i];
-i++;
-}
-dest[dest_len + i] = '\0';
-
-return (dest);
 }
