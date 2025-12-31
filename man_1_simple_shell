@@ -1,0 +1,64 @@
+---
+
+### 3. man_1_simple_shell
+This is the manual page for your custom shell. It uses the standard `troff` format used by the `man` command.
+
+```text
+.TH SIMPLE_SHELL 1 "2025" "SAU 1025" "User Manual"
+
+.SH NAME
+simple_shell \- a custom UNIX command line interpreter
+
+.SH SYNOPSIS
+.B ./hsh
+
+.SH DESCRIPTION
+.B simple_shell
+is a command line interpreter that provides a traditional user interface for UNIX-like systems. It reads commands from standard input or a terminal and executes them.
+
+.PP
+The shell follows these basic steps:
+.IP 1. 2
+Display a prompt and wait for user input.
+.IP 2. 2
+Parse the input into a command and its arguments.
+.IP 3. 3
+Check if the command is a built-in.
+.IP 4. 4
+If not a built-in, search for the command in the directories listed in the PATH.
+.IP 5. 5
+Execute the command in a child process using fork and execve.
+
+.SH BUILT-IN COMMANDS
+The following commands are handled internally by the shell:
+
+.TP
+.B exit
+Exits the shell.
+
+.TP
+.B env
+Prints the current environment variables to standard output.
+
+.SH COMMAND EXECUTION
+.B simple_shell
+uses the 
+.B PATH
+environment variable to locate commands. If a command name contains a slash (/), the shell will attempt to execute that specific file. Otherwise, it searches each directory in the PATH.
+
+.SH RETURN VALUE
+On success, the shell returns 0. If a command is not found, an error message is printed to standard error.
+
+.SH ERROR HANDLING
+If an executable cannot be found, the shell prints an error message in the following format:
+.PP
+.B ./hsh: [line_number]: [command]: not found
+
+.SH BUGS
+This shell does not currently support pipes, redirections, semicolons, or advanced logical operators (&&, ||).
+
+.SH AUTHORS
+Mousa Abdullah Alrizqi / Nizar Maharrak
+
+.SH SEE ALSO
+sh(1), bash(1), printf(3), execve(2), fork(2), wait(2)
