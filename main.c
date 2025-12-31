@@ -12,6 +12,7 @@ int main(int argc, char **argv, char **env)
 char *input = NULL;
 char **args = NULL;
 int status = 0;
+char *first_arg = NULL;
 
 (void)argc;
 
@@ -35,12 +36,15 @@ free_args(args);
 continue;
 }
 
+/* Save first argument before freeing */
+first_arg = args[0];
+
 status = execute_command(args, argv[0]);
 
 free(input);
 free_args(args);
 
-if (status == 0 && args[0] != NULL && _strcmp(args[0], "exit") == 0)
+if (status == 0 && first_arg != NULL && _strcmp(first_arg, "exit") == 0)
 {
 break;
 }
