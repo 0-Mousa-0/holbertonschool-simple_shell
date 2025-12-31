@@ -1,52 +1,35 @@
 #include "shell.h"
 
 /**
- * execute_command - Execute a command with PATH resolution
- * @args: Array of command and arguments
- * Return: Status code
+ * execute - Forks a process and executes the command
+ * @args: Command and arguments
+ * @path: The resolved path to the executable
+ * Return: 1 on success
  */
-int execute_command(char **args)
+int execute(char **args, char *path)
 {
-pid_t pid;
-int status;
-char *full_path;
+	pid_t pid;
+	int status;
 
-if (!args || !args[0])
-return (1);
+	pid = fork();
+	if (pid == 0)
+	{
+		/* Child process */
+		if (execve(path, args, environ) == -1)
+		{
+			perror("Error");
+		}
+		exit(EXIT_FAILURE);
+	}
+	else if (pid < 0)
+	{
+		perror("Fork Error");
+	}
+	else
+	{
+		/* Parent process */
+		waitpid(pid, &status, WUNTRACED);
+	}
 
-if (is_builtin(args[0]))
-return (handle_builtin(args));
-
-full_path = find_command(args[0]);
-if (!full_path)
-{
-print_error(args[0]);
-return (127);
-}
-
-pid = fork();
-if (pid < 0)
-{
-perror("fork");
-free(full_path);
-return (1);
-}
-else if (pid == 0)
-{
-if (execve(full_path, args, environ) == -1)
-{
-print_error(args[0]);
-free(full_path);
-exit(127);
-}
-}
-else
-{
-waitpid(pid, &status, 0);
-free(full_path);
-if (WIFEXITED(status))
-return (WEXITSTATUS(status));
-}
-
-return (1);
+	return (1);
 }
