@@ -1,42 +1,54 @@
 #include "shell.h"
 
 /**
- * main - Simple shell main function
- * Return: Always 0
+ * main - Entry point for the simple shell
+ * Return: 0 on success
  */
 int main(void)
 {
-char *line;
-char **args;
-int status = 0;
-int interactive = isatty(STDIN_FILENO);
-
-while (1)
-{
-if (interactive)
-write(STDOUT_FILENO, "$ ", 2);
-
-line = read_line();
-if (!line)
-{
-if (interactive)
-write(STDOUT_FILENO, "\n", 1);
-break;
+	shell_loop();
+	return (0);
 }
 
-args = parse_line(line);
-if (!args)
+/**
+ * shell_loop - Main shell loop to read and execute commands
+ */
+void shell_loop(void)
 {
-free(line);
-continue;
-}
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char **args;
+	char *full_path;
 
-if (args[0])
-status = execute_command(args);
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, ":) ", 3);
 
-free(line);
-free_args(args);
-}
+		read = getline(&line, &len, stdin);
+		if (read == -1)
+		{
+			free(line);
+			exit(0);
+		}
 
-return (status);
+		args = tokenize(line);
+		if (args && args[0])
+		{
+			full_path = find_path(args[0]);
+			if (full_path)
+			{
+				execute(args, full_path);
+				if (full_path != args[0])
+					free(full_path);
+			}
+			else
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+			}
+		}
+		free(args);
+	}
+	free(line);
 }
