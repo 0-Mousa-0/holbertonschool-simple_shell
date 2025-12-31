@@ -31,7 +31,7 @@ position++;
 if (position >= bufsize)
 {
 bufsize += 64;
-args = realloc(args, bufsize *sizeof(char *));
+args = realloc(args, bufsize * sizeof(char *));
 if (!args)
 return (NULL);
 }
@@ -50,7 +50,7 @@ return (args);
  */
 int is_builtin(char *command)
 {
-char *builtins[] = {"exit", "env", "cd", NULL};
+char *builtins[] = {"exit", NULL};
 int i;
 
 if (!command)
