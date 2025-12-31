@@ -11,7 +11,7 @@ int main(int argc, char **argv, char **env)
 {
 char *input = NULL;
 char **args = NULL;
-int status = 0;  /* Default exit status */
+int status = 0;
 
 (void)argc;
 
@@ -25,7 +25,7 @@ display_prompt();
 
 input = read_input();
 if (input == NULL)
-break;  /* EOF exits with current status */
+break;
 
 args = parse_input(input);
 if (args == NULL || args[0] == NULL)
@@ -42,10 +42,9 @@ free_args(args);
 
 if (status == 0 && args[0] != NULL && _strcmp(args[0], "exit") == 0)
 {
-/* Exit built-in was called */
 break;
 }
 }
 
-return (status);  /* Return last command status */
+return (status);
 }
